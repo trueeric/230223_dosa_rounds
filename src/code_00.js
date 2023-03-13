@@ -213,16 +213,16 @@ function checkSecImportNum(secText){
 // *取得上下午的文字
 function getSecTextFromSheet(shtName){
 
-  let secText,secCtext;
+  let secText,secCText;
   if(shtName=='021_data_morning'){
     secText='morning';
-    secCtext='早自修'
+    secCText='早自修'
   }else if(shtName=='022_data_noon'){
     secText='noon';
-    secCtext='午休'
+    secCText='午休'
   }
 
-  return [secText, secCtext];
+  return [secText, secCText];
 }
 
 // *取得學期第一個周一
