@@ -71,16 +71,12 @@ clearData_011_daily_morning()
 // 異動資料時在該列尾巴加入更新時間及user_gmail
 // onEdit只能有一個
 function onEdit(e){
-  insertTimeEmailMorning(e)
-  insertTimeEmailNoon(e)
-
+  insertTimeEmailMorning(e);
+  insertTimeEmailNoon(e);
 }
 
 function insertTimeEmailMorning(x){
-
-
   // let timezone = SpreadsheetApp.getActive().getSpreadsheetTimeZone();
-
   // let date = Utilities.formatDate(new Date(), timezone, "yyyy/MM/dd HH:mm");
   let date=getDatetime()[0];
   let staffEmail=Session.getActiveUser().getEmail(); //getActiveUser才正確
@@ -244,7 +240,7 @@ function saveDailyMorningPDF(date){
     shLink.getRange(2+i,4,1,1).setValue(pdfUrl);
 
     // 發佈到國高中導師群組
-    sendMessgeToLine(dept,pdfUrl,dateTxt2, secTxt)
+    sendMessageToLine(dept,pdfUrl,dateTxt2, secTxt)
   }
 }
 

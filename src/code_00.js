@@ -48,7 +48,7 @@ function createTriggerNoonNoDataClass() {
    }
 }
 
-// 改datetime的日期格式，沒傳入日期，則傳入今天日期
+// *datetime的日期格式，沒傳入日期，則傳入今天日期
 function getDatetime(importDatetime){
 
   let datetime, date,dateShort;
@@ -65,13 +65,13 @@ function getDatetime(importDatetime){
     dateShort= Utilities.formatDate(new Date(), timezone, "yyMMdd");
     datetime=new Date();
   }
-  
+
   return [dateHourMin, date, dateShort,datetime]
 }
 
 
-// 發每日pdf訊息至國高中導師群組
-function sendMessgeToLine(dept,pdfUrl,dateTxt2,secTxt) {
+// *發每日pdf訊息至國高中導師群組
+function sendMessageToLine(dept,pdfUrl,dateTxt2,secTxt) {
 
   let message, deptTxt, secCTxt;
   let lineTokens=[]
@@ -93,12 +93,10 @@ function sendMessgeToLine(dept,pdfUrl,dateTxt2,secTxt) {
 
   // 時段
   if (secTxt=='morning' || secTxt == null){
-
-    secCTxt="早自修"
+    secCTxt="早自修";
 
   }else if(secTxt=='noon'){
-
-    secCTxt="午休"
+    secCTxt="午休";
 
   }
 
@@ -138,18 +136,14 @@ function sendMessgeToLine(dept,pdfUrl,dateTxt2,secTxt) {
 }
 
 
-// return sorted class group by grade
+// *回傳以年級分群的班級並排序
 function  getSortedGroupEclass(eclassArr){
 
   let eclassTxt='';
   let grade='';
 
-  // test
-  // eclassArr=['J101','H103', 'H102', 'H302']
-
   // 排序eclass
   eclassArr=eclassArr.sort();
-  // console.log(eclassArr);
 
   for (i=0;i<eclassArr.length;i++){
 
@@ -179,13 +173,14 @@ function  getSortedGroupEclass(eclassArr){
   return eclassTxt;
 }
 
+// !以下未完成，先放著
 // 確認是否已完成全部匯入該時段_temp
 function checkSecImportNum(secText){
 
   // 抓第一頁的班級數
   // let firstShtName='011_daily_morning';
   let firstShtName='012_daily_noon';
-  
+
   secText='morning';
 
   // 依時段決定開哪個匯入檔
@@ -215,9 +210,9 @@ function checkSecImportNum(secText){
 
 
 
-// 取得上下午的文字
+// *取得上下午的文字
 function getSecTextFromSheet(shtName){
-  
+
   let secText,secCtext;
   if(shtName=='021_data_morning'){
     secText='morning';
@@ -227,11 +222,10 @@ function getSecTextFromSheet(shtName){
     secCtext='午休'
   }
 
-  return [secText, secCtext]
-
+  return [secText, secCtext];
 }
 
-// 取得學期第一個周一
+// *取得學期第一個周一
 function getSemiMonday(){
   let sheetTabNameToGet = "002_params";
   let ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -240,9 +234,9 @@ function getSemiMonday(){
   return semiMonday;
 }
 
-// 計算周別，沒參數則算到目前日期的周別
+// *計算周別，沒參數則算到目前日期的周別
 function getSchWeek(date){
-  
+
   let endDate,weekNum, dayNum, weekDay;
   let startMonday=getSemiMonday();
 
@@ -254,9 +248,7 @@ function getSchWeek(date){
 
     weekDay=endDate.getDay();
     dayNum=Number(Math.floor((endDate-startMonday)/(24*3600*1000)).toFixed(0));
-   
     weekNum=Number((Math.floor(dayNum-weekDay+1)/7).toFixed(0))+1;
-
   }
   return [weekDay, dayNum ,weekNum];
 }

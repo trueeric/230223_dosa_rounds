@@ -12,7 +12,7 @@ function clearData_012_daily_noon() {
   let range=sheetName.getRange('c3:q48');
   range.setValue(null);
   // SpreadsheetApp.getUi().alert("012每日午休工作表資料清空完成!");
-  
+
 }
 
 //當日午休資料歸檔至022_data_noon
@@ -31,7 +31,7 @@ function copyDailyNoonTo022_Data_noon(){
   let targetLastRow=targetSheet.getLastRow();
   // console.log(targetLastRow)
   sourceRange.copyTo(targetSheet.getRange(targetLastRow+1,3));
-  
+
   //插入第1欄_index函數 要改成 r1c1模式
   let targetIndexColumnRange=targetSheet.getRange(targetLastRow+1,1,sourceRowCount,1);
   let formula_0='=if(ISBLANK(INDIRECT("R[0]C[2]",false)),"",INDIRECT("R[0]C[2]",false)&if(isblank(INDIRECT("R[0]C[17]",false)),"","_"&text(INDIRECT("R[0]C[17]",false),"yymmdd")))';
@@ -46,7 +46,7 @@ function copyDailyNoonTo022_Data_noon(){
   let targetNameColumnRange=targetSheet.getRange(targetLastRow+1,20,sourceRowCount,1);
   let formula_20='=if(isblank(INDIRECT("R[0]C[-1]",false)),"",ifna(vlookup(INDIRECT("R[0]C[-1]",false),\'052_dosa_staff\'!$A$1:$B,2,0),""))';
   targetNameColumnRange.setFormula(formula_20);
-  
+
 
 
    // 插入column_21 :=if(ISBLANK($C3),"",if(n3,1,0)) 導師是否隨班 沒有:0 有:1 無法確定:2 要改成 r1c1模式
@@ -80,11 +80,11 @@ function saveDailyNoonPDF(date){
   let dateTxt = getDatetime(date)[2]; //yyMMdd
   let dateTxt2 = datetime;
 
-  
+
   // 部別
   deptArr=["H","J"]
   for (let i=0;i<deptArr.length;i++){
-    
+
     dept=deptArr[i];
     console.log(dept)
     if (dept=='H'){
@@ -118,7 +118,7 @@ function saveDailyNoonPDF(date){
     exportUrl = url_base + 'export?exportFormat=pdf&format=pdf' +
 
       '&gid=' + sheetTabId + '&id=' + ssID +
-      '&range=' + range + 
+      '&range=' + range +
       //'&range=NamedRange +
       '&size=A4' +     // paper size
       '&portrait=true' +   // orientation, false for landscape
@@ -128,7 +128,7 @@ function saveDailyNoonPDF(date){
       '&fzr=false';       // do not repeat row headers (frozen rows) on each page
 
     // Logger.log('exportUrl: ' + exportUrl)
-    
+
     options = {
       headers: {
         'Authorization': 'Bearer ' +  ScriptApp.getOAuthToken(),
@@ -148,9 +148,9 @@ function saveDailyNoonPDF(date){
 
     blob = response.getBlob();
     let driverFolder=DriveApp.getFoldersByName("800_dosa_rounds").next()
-    
+
     fileName=dateTxt+'_'+secTxt+'_'+dept+'.pdf'
-    
+
     blob.setName(fileName)
 
     pdfFile = driverFolder.createFile(blob);//Create the PDF file
@@ -164,7 +164,7 @@ function saveDailyNoonPDF(date){
     shLink.getRange(4+i,4,1,1).setValue(pdfUrl);
 
     // 發佈到國、高中導師群組
-    sendMessgeToLine(dept,pdfUrl,dateTxt2, secTxt)
+    sendMessageToLine(dept,pdfUrl,dateTxt2, secTxt)
   }
 }
 
@@ -179,7 +179,7 @@ function sendNoonClassNoData(){
   let todayDate=datetime.slice(8,10);
   let eclassArr=[];
   let eclassTxt='';
-  
+
   // let message='~學務巡視測試模擬 *周一至周五1400-1500* 自動發通知至學務相關群組提醒學務夥伴~'+ '\n' ;
   let message='❖學務班級巡視❖'+ '\n' ;
 
@@ -204,7 +204,7 @@ function sendNoonClassNoData(){
 
   if (noDataClass.length<=0) {
     message+='本('+ todayDate +')日午休巡視結果，各班資料 *皆已入檔* ，感謝好夥伴的協助!!' + '\n';
-  
+
   }else{
 
     message+='本('+ todayDate +')日 *午休* 巡視，下列班級紀錄目前尚未入檔，煩請同仁協助處理，感謝您的幫忙!! ' + '\n';
@@ -220,6 +220,6 @@ function sendNoonClassNoData(){
       // console.log(eclassArr)
   }
   // console.log(message)
-  sendLineNotify(message,lineTokens)  
+  sendLineNotify(message,lineTokens)
 
 }
