@@ -69,6 +69,42 @@ function getDatetime(importDatetime){
   return [dateHourMin, date, dateShort,datetime]
 }
 
+// *取得發送的 line token array
+function getLineTokens(dept){
+  let lineTokens=[]
+  // eric_temp
+  // let token = "i4npBEKuCBH5sUQ6LxuaOIDhsev3q5VzpnYs97wZW0u";
+  // 2021學務網路測試_仁者無敵
+  let token2 = "gzyQg3S3QzZltehQKTMWl5BEkJ6iczB7kAynCJ0pDp3";
+  // 2023學務網路測試_學務測試
+  let token3 = "3EiMf2mx0LWiSU070a771Q3YMTcECV6uxbfQmBGvrSt";
+  // 2023學務處_110學務處
+  let token4 = "eoxQYuy5mr9qeh4WsS0yXm1BvzvBWKiJvxz0bSMkLEb";
+
+  // 高中導師群組line token 先用eric_temp代替
+  let tokenH = "i4npBEKuCBH5sUQ6LxuaOIDhsev3q5VzpnYs97wZW0u";
+
+  // 國中導師line token  先用eric_temp代替
+  let tokenJ = "i4npBEKuCBH5sUQ6LxuaOIDhsev3q5VzpnYs97wZW0u";
+
+  if (dept!=null && pdfUrl !=null) {
+
+    if(dept=='H'){
+
+      lineTokens.push(tokenH);
+      lineTokens.push(token4);
+      deptTxt='高中部'
+
+    }else{
+
+      lineTokens.push(tokenJ);
+      lineTokens.push(token4);
+      deptTxt='國中部'
+
+    }
+  }
+  return lineTokens;
+}
 
 // *發每日pdf訊息至國高中導師群組
 function sendMessageToLine(dept,pdfUrl,dateTxt2,secTxt) {
@@ -106,13 +142,13 @@ function sendMessageToLine(dept,pdfUrl,dateTxt2,secTxt) {
 
     if(dept=='H'){
 
-      lineTokens.push(tokenH);
+      lineTokens.push(tokenH);// 高中導師群組line token 先用eric_temp代替
       lineTokens.push(token4);
       deptTxt='高中部'
 
     }else{
 
-      lineTokens.push(tokenJ);
+      lineTokens.push(tokenJ);// 高中導師群組line token 先用eric_temp代替
       lineTokens.push(token4);
       deptTxt='國中部'
 
@@ -251,6 +287,27 @@ function getSchWeek(date){
     weekNum=Number((Math.floor(dayNum-weekDay+1)/7).toFixed(0))+1;
   }
   return [weekDay, dayNum ,weekNum];
+}
+
+// 取得中文年級
+function getCGrade(grade) {
+  let gradeNum;
+  let deptTxt=(grade.slice(0,1)=='H')?'高':'國';
+  switch (grade.slice(1,2)){
+    case '1':
+      gradeNum='壹';
+      break;
+
+    case '2':
+      gradeNum='貳';
+      break;
+
+    case '3':
+      gradeNum='叁';
+      break;
+  }
+  // console.log(deptTxt+gradeNum);
+  return deptTxt+gradeNum;
 }
 
 
