@@ -239,13 +239,26 @@ function weekExportSinglePage(){
   ss = SpreadsheetApp.getActiveSpreadsheet();
   sh = ss.getSheetByName(exportSheetName);
   grade=sh.getRange("c1").getValue();
-  week=sh.getRange("e1").getValue();
   secCText=sh.getRange("h1").getValue();
+  week=sh.getRange("e1").getValue();
 
   // params of saveWeekPDFs(grade, sourceSecCText, week)
   saveWeekPDFs(grade, secCText, week);
   // console.log(grade,secCText,week);
   console.log('finish!!');
+}
+
+function weekExportSaturdayAuto(){
+
+  let grade, secCText, week;
+  grade=null;
+  secCText=null;
+  week=getSchWeek()[2];
+
+  // params of saveWeekPDFs(grade, sourceSecCText, week)
+  saveWeekPDFs(grade, secCText, week);
+  // console.log(grade,secCText,week);
+  // console.log('finish!!');
 }
 
 
@@ -262,7 +275,8 @@ function test4() {
 function test5() {
   let g='H'
   let kk=getLineTokens(g);
-  console.log(kk);
+  let ww=getSchWeek()[2];
+  console.log(ww);
 }
 
 

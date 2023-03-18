@@ -92,12 +92,12 @@ function getLineTokens(dept){
   }
   if(dept=='H'){
     lineTokens.push(tokenH);
-    lineTokens.push(token3);
+    // lineTokens.push(token3);
     lineTokens.push(token4);
     deptTxt='高中部';
   }else{
     lineTokens.push(tokenJ);
-    lineTokens.push(token3);
+    // lineTokens.push(token3);
     lineTokens.push(token4);
     deptTxt='國中部';
   }
