@@ -87,21 +87,19 @@ function getLineTokens(dept){
   // 國中導師line token  先用eric_temp代替
   let tokenJ = "i4npBEKuCBH5sUQ6LxuaOIDhsev3q5VzpnYs97wZW0u";
 
-  if (dept!=null && pdfUrl !=null) {
-
-    if(dept=='H'){
-
-      lineTokens.push(tokenH);
-      lineTokens.push(token4);
-      deptTxt='高中部'
-
-    }else{
-
-      lineTokens.push(tokenJ);
-      lineTokens.push(token4);
-      deptTxt='國中部'
-
-    }
+  if (dept==null ) {
+    return 'Error!!';
+  }
+  if(dept=='H'){
+    lineTokens.push(tokenH);
+    lineTokens.push(token3);
+    lineTokens.push(token4);
+    deptTxt='高中部';
+  }else{
+    lineTokens.push(tokenJ);
+    lineTokens.push(token3);
+    lineTokens.push(token4);
+    deptTxt='國中部';
   }
   return lineTokens;
 }

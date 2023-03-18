@@ -1,10 +1,11 @@
 // 製作weekpdf
-function saveWeekPDFs(grade, sht, week){
+function saveWeekPDFs(grade, sourceSecCText, week){
 
   let pdfFileName, secCText, secText, eGrade, range, weekNum, cGrade;
-  let shtLink, linkSheetName, ss, sh, exportSheetName, dept, message, messageDesc;
+  let linkSheetName, ss, sh, exportSheetName, dept, message, messageDesc;
+  let lineToken, shtLink;
   let gradeArr=[];
-  let shtArr=[];
+  let secTextArr=[];
   let receivePdfArr=[]; // 接收pdf參數
   let pdfDetailArr=[];
   let tempArr=[];
@@ -27,26 +28,28 @@ function saveWeekPDFs(grade, sht, week){
   // console.log('g3',week);
 
   // 年級 沒傳入值代表全部年級
-  // if (grade){
-  //   gradeArr.push(grade)
-  // }else{
-  //   gradeArr=["H1","H2","H3","J1","J2","J3"]
-  // }
-  gradeArr=["H1","J2"];
+  if (grade){
+    gradeArr.push(grade)
+  }else{
+  gradeArr=["H1","H2","H3","J1","J2","J3"]
+  }
+  // gradeArr=["H1","J2","H2"];
   // gradeArr=["H1"];
   gradeArr.sort();
   const deptArr=Array.from(new Set(gradeArr.map(s=>s[0])));
-  console.log('gradeArr:',gradeArr);
-  console.log('deptArr:',deptArr);
+  // console.log('gradeArr:',gradeArr);
+  // console.log('deptArr:',deptArr);
+  // console.log('sourceSecCText:',sourceSecCText);
 
   // 時段，沒傳入值代早、午都處理
-  if(sht){
-    shtArr.push(sht)
+  if(sourceSecCText){
+    secText=(sourceSecCText=="早自修")?"021_data_morning":"022_data_noon";
+    secTextArr.push(secText);
   }else{
-    shtArr=["021_data_morning","022_data_noon"];
+    secTextArr=["021_data_morning","022_data_noon"];
   }
   // console.log('sht:',sht);
-  console.log('shtArr:',shtArr);
+  console.log('secTextArr:',secTextArr);
 
   // 周別
   weekNum=(week)?week: getSchWeek()[2];
@@ -54,8 +57,9 @@ function saveWeekPDFs(grade, sht, week){
 
   for (let k=0;k<deptArr.length;k++){
 
+    lineToken=getLineTokens(deptArr[k]);
     // 表頭不要重覆
-    message = "~測試中~_學務處巡視第"+ weekNum + "周彙整表" + "\n";
+    message = "~巡視周報測試~_學務處巡視第"+ weekNum + "周彙整表" + "\n";
     message +="相關資料已上傳，請按下方連結，點閱pdf檔資料。如出現驗證畫面時，煩請同仁以「瀛海中學核發的gmail」(例如 ooo@gm.yhsh.tn.edu.tw )身份登入。" + "\n"+ "\n";
 
     for (let i=0;i<gradeArr.length;i++){
@@ -67,28 +71,33 @@ function saveWeekPDFs(grade, sht, week){
         continue;
       }
       cGrade=getCGrade(eGrade);
-      sh.getRange('c1').setValue(eGrade)
-      sh.getRange('e1').setValue(weekNum)
+      sh.getRange(1,3,1,1).setValue(eGrade);
+      sh.getRange(1,5,1,1).setValue(weekNum);
       // 決定列印範圍，j1、j2只有7班
       if (eGrade =='J1' ||  eGrade=='J2'){
         range = "C4:O12";
       }else{
         range = "C4:O13";
       }
-      message +="年級: 【" +  cGrade + " 】" "\n";
 
-      for (let j=0;j<shtArr.length;j++){
+      message +="年級: " +  cGrade + "\n";
+
+      for (let j=0;j<secTextArr.length;j++){
         // 取得時段文字
-        secCText=getSecTextFromSheet(shtArr[j])[1]
-        secText=getSecTextFromSheet(shtArr[j])[0]
-        // console.log(range);
-        sh.getRange('h1').setValue(secCText)
+        secCText=getSecTextFromSheet(secTextArr[j])[1]
+        secText=getSecTextFromSheet(secTextArr[j])[0]
+        sh.getRange(1,8,1,1).setValue(secCText);
 
-        Utilities.sleep(3000);
+        // 重整頁面
+        SpreadsheetApp.flush();
+        Utilities.sleep(2000);
+
         pdfFileName=dateTxt + '_week' + zeroPadLeft(weekNum,2) + '_' + secText + '_' + eGrade
 
         // console.log(sh.getRange('c1').getValue())
         console.log(eGrade);
+        // console.log('c1:',sh.getRange('c1').getValue());
+        // console.log('h1:',sh.getRange('h1').getValue());
         // console.log(weekNum);
         // console.log(secCText);
         // console.log(exportSheetName);
@@ -110,24 +119,27 @@ function saveWeekPDFs(grade, sht, week){
         Utilities.sleep(2500);
 
         messageDesc +="檔案說明: " +"第" + weekNum + "周" + secCText + " 巡視彙整" + "\n";
-        messageDesc +="檔案連結網址: " + pdfUrl + " \n"+ "\n"
+        messageDesc +="檔案連結網址: " + pdfUrl + "\n"+ "\n";
 
         pdfDetailArr.push(receivePdfArr);
       }
 
-      message += messageDesc;
+      message += messageDesc + "\n";
     }
     message +="上傳日期: " +  date + "\n"+ "\n";
-    console.log(message);
+    // todo:傳訊息到line，國、高中部，整合完只傳一次就好
+    // remark Notify(message, lineTokens)
+    if(gradeArr.length>=6){
+      // console.log(message);
+      sendLineNotify(message, lineToken)
+    }
   }
 
   // todo:存入本次的連結資訊至 055_download_links
-
-  // todo:傳訊息到line，國、高中部，整合完只傳一次就好
-
-    // Utilities.sleep(10000);
-    // 發佈到國高中導師群組
-  console.log(pdfDetailArr);
+  // console.log(pdfDetailArr);
+  if(gradeArr.length>=6){
+    weekPdfDataSaveToSheet(pdfDetailArr)
+  }
 }
 
 
@@ -149,13 +161,8 @@ function saveToPdf(sheetName, exportRange, exportFileName){
 
   // pdf create datetime
   pdfCreateTime=getDatetime()[0];
-
-  // console.log(ssID,sh)
-
   url_base = ss.getUrl().replace(/edit$/,'');
-
   // Logger.log('url_base: ' + url_base)
-
   exportUrl = url_base + 'export?exportFormat=pdf&format=pdf' +
     '&gid=' + sheetTabId + '&id=' + ssID +
     '&range=' + exportRange +
@@ -165,9 +172,7 @@ function saveToPdf(sheetName, exportRange, exportFileName){
     '&sheetnames=false&printtitle=false&pagenumbers=true' + //hide optional headers and footers
     '&gridlines=false' + // hide gridlines
     '&fzr=false';       // do not repeat row headers (frozen rows) on each page
-
   // Logger.log('exportUrl: ' + exportUrl)
-
   options = {
     headers: {
       'Authorization': 'Bearer ' +  ScriptApp.getOAuthToken(),
@@ -186,101 +191,65 @@ function saveToPdf(sheetName, exportRange, exportFileName){
   fileName=exportFileName +'.pdf'
   blob.setName(fileName)
   pdfFile = driverFolder.createFile(blob);//Create the PDF file
-  // pdfID=pdfFile.getId()
+  pdfID=pdfFile.getId()
   pdfUrl='https://drive.google.com/file/d/'+ pdfID +'/view?usp=share_link'
 
-
   // Logger.log('pdfFile ID: ' +pdfID)
-
   // console.log(exportFileName,exportRange)
   // console.log(pdfUrl,fileName)
   Utilities.sleep(1000);
   return [exportFileName, pdfUrl, pdfCreateTime];
 }
 
-function test2(){
 
-  // const zeroPadLeft=(num, places)=>String(num).padStart(places,0);
-
-  // console.log(zeroPadLeft(2,2));
-  // console.log(zeroPadLeft(22,2));
-  // let sheetName='021_data_morning';
-  let grade="H1";
-  let week=4;
-  let tempArr=[]
-  let tempArr2=[]
-
-  // saveToPdf(sheetName,exportRange, exportFileName  )
-  // saveWeekPDFs(grade, sheetName, week);
-  saveWeekPDFs(null,null,4);
-  console.log('finish!!');
-
-  // tempArr.q1=grade;
-  // tempArr.q2=week;
-  // tempArr.q3=sheetName;
-  // tempArr={
-  //   q1:grade,
-  //   q2:week,
-  //   q3:sheetName,
-  // }
-
-  // tempArr2.push(tempArr);
-  // tempArr2.push(tempArr);
-  // console.log(tempArr);
-  // console.log(tempArr2);
-
-}
-
-
-function test3(){
+function weekPdfDataSaveToSheet(tempArr){
   let ss, sh, sheetName;
-
-  let tempArr=[ { grade: 'H1',
-  date: '230313',
-  secText: 'morning',
-  pdfFileName: '230313_week04_morning_H1',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' },
-{ grade: 'H1',
-  date: '230313',
-  secText: 'noon',
-  pdfFileName: '230313_week04_noon_H1',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' },
-{ grade: 'H2',
-  date: '230313',
-  secText: 'morning',
-  pdfFileName: '230313_week04_morning_H2',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' },
-{ grade: 'H2',
-  date: '230313',
-  secText: 'noon',
-  pdfFileName: '230313_week04_noon_H2',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' },
-{ grade: 'J2',
-  date: '230313',
-  secText: 'morning',
-  pdfFileName: '230313_week04_morning_J2',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' },
-{ grade: 'J2',
-  date: '230313',
-  secText: 'noon',
-  pdfFileName: '230313_week04_noon_J2',
-  pdfUrl: 'https://drive.google.com/file/d/undefined/view?usp=share_link' } ]
 
   sheetName='055_download_links';
   ss = SpreadsheetApp.getActiveSpreadsheet();
   sh = ss.getSheetByName(sheetName);
 
-  // sh.getRange(2,6,20,20).setValues(tempArr);
-  // tempArr.keys
-  // console.log(Object.values(tempArr)[1]);
   for (let row=0;row<tempArr.length;row++){
     for(let col=0;col<5;col++){
       sh.getRange(row+2,col+6,1,1).setValue(Object.values(tempArr[row])[col])
-      // console.log(tempArr[i].grade);
-      // console.log(tempArr[i].pdfUrl);
     }
   }
 }
+
+function weekExportAllGrade(){
+
+  let week;
+  let ss, sh, exportSheetName ;
+
+  exportSheetName='045_dosa_week_report';
+  ss = SpreadsheetApp.getActiveSpreadsheet();
+  sh = ss.getSheetByName(exportSheetName);
+  week=sh.getRange("e1").getValue();
+
+  saveWeekPDFs(null,null,week);
+  console.log('finish!!');
+}
+
+function weekExportSinglePage(){
+
+  let grade, secCText, week;
+  let ss, sh, exportSheetName ;
+
+  exportSheetName='045_dosa_week_report';
+  ss = SpreadsheetApp.getActiveSpreadsheet();
+  sh = ss.getSheetByName(exportSheetName);
+  grade=sh.getRange("c1").getValue();
+  week=sh.getRange("e1").getValue();
+  secCText=sh.getRange("h1").getValue();
+
+  // params of saveWeekPDFs(grade, sourceSecCText, week)
+  saveWeekPDFs(grade, secCText, week);
+  // console.log(grade,secCText,week);
+  console.log('finish!!');
+}
+
+
+
 
 function test4() {
   let tempArr=['H1','H2','H2'];
@@ -288,6 +257,12 @@ function test4() {
   const noDupArray=Array.from(new Set(tempArr.map(s=>s[0])));
 
   console.log(noDupArray);
+}
+
+function test5() {
+  let g='H'
+  let kk=getLineTokens(g);
+  console.log(kk);
 }
 
 
